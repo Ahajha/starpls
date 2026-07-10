@@ -1698,7 +1698,7 @@ impl GlobalContext {
         }
     }
 
-    pub fn cancel(&self) -> CancelGuard {
+    pub fn cancel(&self) -> CancelGuard<'_> {
         CancelGuard::new(self)
     }
 
