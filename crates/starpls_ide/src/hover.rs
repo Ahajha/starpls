@@ -261,7 +261,7 @@ def f$0oo(x, y):
                 ```python
                 (function) def foo(x, y) -> Unknown
                 ```
-                Doc string
+                Doc string  
             "#]],
         );
     }
@@ -280,7 +280,7 @@ f$0oo(1, 2)
                 ```python
                 (function) def foo(x, y) -> Unknown
                 ```
-                Doc string
+                Doc string  
             "#]],
         );
     }
@@ -314,7 +314,7 @@ def foo(a$0bc):
                 ```python
                 (parameter) abc: Unknown
                 ```
-                Easy as 123!
+                Easy as 123!  
             "#]],
         );
     }
@@ -336,7 +336,7 @@ foo(a$0bc = 123)
                 ```python
                 (parameter) abc: Unknown
                 ```
-                Easy as 123!
+                Easy as 123!  
             "#]],
         );
     }
@@ -384,7 +384,7 @@ Foo$0Info = provider(doc = "The foo provider")
                 ```python
                 (variable) FooInfo: Provider[FooInfo]
                 ```
-                The foo provider
+                The foo provider  
             "#]],
         );
     }
@@ -407,7 +407,7 @@ foo.b$0ar
                 ```python
                 (field) bar: Unknown
                 ```
-                The bar field
+                The bar field  
             "#]],
         );
     }
@@ -431,7 +431,7 @@ foo(
                 ```python
                 (parameter) bar: string
                 ```
-                The bar attr
+                The bar attr  
             "#]],
         );
     }

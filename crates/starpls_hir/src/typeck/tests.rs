@@ -650,7 +650,7 @@ fn test_list_addition() {
     check_infer(
         r#"
 a = [1] + [2]
-x = [1, 2, 3] + ["a", "b", "c"]
+x = [1, 2, 3] + ["a", "b", "c"]    
 y = x[0]
 i = 1 # type: int | string
 j = [i] + [""]
@@ -1659,7 +1659,7 @@ my_rule = rule(
     attrs = {
         "srcs": attr.label_list(),
     },
-)
+)    
 "#,
         expect![[r#"
             26..29 "foo": Unknown
@@ -1765,7 +1765,7 @@ fn test_builtin_provider() {
     check_infer(
         r#"
 default_info = DefaultInfo()
-default_info.file
+default_info.file    
 
 flag_info = config_common.FeatureFlagInfo()
 flag_info.value
