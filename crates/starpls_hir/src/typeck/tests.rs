@@ -1,26 +1,26 @@
 use std::cmp::Ordering;
 use std::fmt::Write;
 
-use expect_test::expect;
 use expect_test::Expect;
+use expect_test::expect;
 use itertools::Itertools;
 use starpls_bazel::APIContext;
-use starpls_common::parse;
 use starpls_common::Db as _;
 use starpls_common::Dialect;
 use starpls_common::FileId;
 use starpls_common::FileInfo;
+use starpls_common::parse;
 use starpls_syntax::ast::AstNode;
 use starpls_test_util::FixtureType;
 
-use crate::source_map;
-use crate::test_database::TestDatabaseBuilder;
-use crate::typeck::assign_tys;
-use crate::typeck::Ty;
-use crate::typeck::TyKind;
 use crate::Db as _;
 use crate::DisplayWithDb;
 use crate::InferenceOptions;
+use crate::source_map;
+use crate::test_database::TestDatabaseBuilder;
+use crate::typeck::Ty;
+use crate::typeck::TyKind;
+use crate::typeck::assign_tys;
 
 fn check_infer(input: &str, expect: Expect) {
     check_infer_with_options(
@@ -650,7 +650,7 @@ fn test_list_addition() {
     check_infer(
         r#"
 a = [1] + [2]
-x = [1, 2, 3] + ["a", "b", "c"]    
+x = [1, 2, 3] + ["a", "b", "c"]
 y = x[0]
 i = 1 # type: int | string
 j = [i] + [""]
@@ -1659,7 +1659,7 @@ my_rule = rule(
     attrs = {
         "srcs": attr.label_list(),
     },
-)    
+)
 "#,
         expect![[r#"
             26..29 "foo": Unknown
@@ -1765,7 +1765,7 @@ fn test_builtin_provider() {
     check_infer(
         r#"
 default_info = DefaultInfo()
-default_info.file    
+default_info.file
 
 flag_info = config_common.FeatureFlagInfo()
 flag_info.value

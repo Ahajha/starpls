@@ -11,14 +11,14 @@ use starpls_hir::Param;
 use starpls_hir::ScopeDef;
 use starpls_hir::Semantics;
 use starpls_hir::Type;
-use starpls_syntax::ast::AstNode;
-use starpls_syntax::ast::AstToken;
-use starpls_syntax::ast::{self};
-use starpls_syntax::parse_module;
 use starpls_syntax::SyntaxKind::*;
 use starpls_syntax::SyntaxNode;
 use starpls_syntax::TextRange;
 use starpls_syntax::TextSize;
+use starpls_syntax::ast::AstNode;
+use starpls_syntax::ast::AstToken;
+use starpls_syntax::ast::{self};
+use starpls_syntax::parse_module;
 
 use crate::FilePosition;
 
@@ -424,13 +424,13 @@ fn maybe_str_context(file_id: FileId, root: &SyntaxNode, pos: TextSize) -> Optio
         let load_stmt = ast::LoadStmt::cast(parent.parent()?)?;
         return Some(StringContext::LoadItem { file_id, load_stmt });
     } else if let Some(expr) = ast::LiteralExpr::cast(parent) {
-        if let Some(index_expr) = ast::IndexExpr::cast(expr.syntax().parent()?) {
-            if index_expr.index() == Some(ast::Expression::Literal(expr)) {
-                return Some(StringContext::DictKey {
-                    file_id,
-                    lhs: index_expr.lhs()?,
-                });
-            }
+        if let Some(index_expr) = ast::IndexExpr::cast(expr.syntax().parent()?)
+            && index_expr.index() == Some(ast::Expression::Literal(expr))
+        {
+            return Some(StringContext::DictKey {
+                file_id,
+                lhs: index_expr.lhs()?,
+            });
         }
 
         // Check if the current text is potentially a label.
@@ -580,14 +580,14 @@ fn strip_last_package_or_target(label: &str) -> &str {
 mod tests {
     use std::fmt::Write;
 
-    use expect_test::expect;
     use expect_test::Expect;
+    use expect_test::expect;
     use starpls_hir::Db;
 
-    use crate::completions::CompletionRelevance;
     use crate::Analysis;
     use crate::CompletionItemKind;
     use crate::FilePosition;
+    use crate::completions::CompletionRelevance;
 
     fn check_completions(fixture: &str, expect: Expect) {
         check_completions_with_options(fixture, false, expect);

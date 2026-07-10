@@ -5,19 +5,19 @@ use starpls_hir::LoadItem;
 use starpls_hir::Name;
 use starpls_hir::ScopeDef;
 use starpls_hir::Semantics;
+use starpls_syntax::SyntaxToken;
+use starpls_syntax::T;
+use starpls_syntax::TextRange;
 use starpls_syntax::ast::AstNode;
 use starpls_syntax::ast::{self};
 use starpls_syntax::match_ast;
-use starpls_syntax::SyntaxToken;
-use starpls_syntax::TextRange;
-use starpls_syntax::T;
 
-use crate::util::pick_best_token;
 use crate::Database;
 use crate::FilePosition;
 use crate::LocationLink;
 use crate::ResolvedPath;
 use crate::TextSize;
+use crate::util::pick_best_token;
 
 struct GotoDefinitionHandler<'a> {
     sema: Semantics<'a>,
