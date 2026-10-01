@@ -2362,7 +2362,7 @@ fn test_assign_int_literal_to_bool() {
 
 #[test]
 fn test_resolve_empty_unspecified() {
-        check_infer(
+    check_infer(
         r#"
 a = []
 b = [] if True else [""]
