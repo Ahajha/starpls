@@ -1,2 +1,4 @@
 [toolchain]
-channel = "nightly-2023-12-06"
+channel = "1.86.0"
+
+components = ["rust-analyzer"]
