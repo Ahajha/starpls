@@ -2,21 +2,21 @@ use std::fmt::Display;
 use std::fmt::Write;
 use std::fmt::{self};
 
+use crate::Db;
+use crate::Name;
+use crate::Ty;
+use crate::Type;
 use crate::def::Param as HirDefParam;
 use crate::module;
-use crate::typeck::builtins::BuiltinFunctionParam;
-use crate::typeck::intrinsics::IntrinsicFunctionParam;
-use crate::typeck::resolve_type_ref;
-use crate::typeck::with_tcx;
 use crate::typeck::Protocol;
 use crate::typeck::RuleKind;
 use crate::typeck::Tuple;
 use crate::typeck::TyKind;
 use crate::typeck::TypeRef;
-use crate::Db;
-use crate::Name;
-use crate::Ty;
-use crate::Type;
+use crate::typeck::builtins::BuiltinFunctionParam;
+use crate::typeck::intrinsics::IntrinsicFunctionParam;
+use crate::typeck::resolve_type_ref;
+use crate::typeck::with_tcx;
 
 pub trait DisplayWithDb {
     fn fmt(&self, db: &dyn Db, f: &mut fmt::Formatter<'_>) -> fmt::Result;

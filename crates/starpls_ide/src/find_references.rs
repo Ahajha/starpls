@@ -4,16 +4,16 @@ use starpls_common::File;
 use starpls_hir::Name;
 use starpls_hir::ScopeDef;
 use starpls_hir::Semantics;
+use starpls_syntax::T;
+use starpls_syntax::TextSize;
 use starpls_syntax::ast::AstNode;
 use starpls_syntax::ast::{self};
 use starpls_syntax::match_ast;
-use starpls_syntax::TextSize;
-use starpls_syntax::T;
 
-use crate::util::pick_best_token;
 use crate::Database;
 use crate::FilePosition;
 use crate::Location;
+use crate::util::pick_best_token;
 
 struct FindReferencesHandler<'a> {
     sema: &'a Semantics<'a>,
@@ -118,7 +118,7 @@ pub(crate) fn find_references(
             .into_iter()
             .flat_map(|def| match &def {
                 ScopeDef::Variable(_) => Some(def),
-                ScopeDef::Callable(ref callable) if callable.is_user_defined() => Some(def),
+                ScopeDef::Callable(callable) if callable.is_user_defined() => Some(def),
                 _ => None,
             })
             .collect::<Vec<_>>();

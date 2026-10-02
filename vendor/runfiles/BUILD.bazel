@@ -11,7 +11,7 @@ workspace_name(
 rust_library(
     name = "runfiles",
     srcs = ["src/lib.rs"],
-    edition = "2021",
+    edition = "2024",
     rustc_env_files = [
         ":workspace_name.env",
     ],

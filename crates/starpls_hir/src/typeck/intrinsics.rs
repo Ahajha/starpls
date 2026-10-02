@@ -3,6 +3,8 @@ use std::sync::Arc;
 use rustc_hash::FxHashMap;
 use smallvec::smallvec;
 
+use crate::Db;
+use crate::Name;
 use crate::def::Argument;
 use crate::def::InternedString;
 use crate::typeck::Binders;
@@ -12,8 +14,6 @@ use crate::typeck::Tuple as TupleVariants;
 use crate::typeck::Ty;
 use crate::typeck::TyKind;
 use crate::typeck::{self};
-use crate::Db;
-use crate::Name;
 
 #[salsa::tracked]
 pub(crate) struct Intrinsics {
@@ -240,19 +240,39 @@ pub(crate) fn intrinsic_functions(db: &dyn Db) -> IntrinsicFunctions {
     };
 
     // TODO(withered-magic): SupportsAbs[T] -> T
-    add_function("abs", "`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a non-negative number with the same magnitude).", vec![positional(Any)], Any);
-    add_function("any", "`any(x)` returns `True` if any element of the iterable sequence x is true. If the iterable is empty, it returns `False`.", vec![positional(Any)], non_literal_bool());
-    add_function("all", "`all(x)` returns `False` if any element of the iterable sequence x is false. If the iterable is empty, it returns `True`.", vec![positional(Any)], non_literal_bool());
-    add_function("bool", "`bool(x)` interprets `x` as a Boolean value---`True` or `False`. With no argument, `bool()` returns `False`.", vec![positional_opt(Any)], non_literal_bool());
+    add_function(
+        "abs",
+        "`abs(x)` takes either an integer or a float, and returns the absolute value of that number (a non-negative number with the same magnitude).",
+        vec![positional(Any)],
+        Any,
+    );
+    add_function(
+        "any",
+        "`any(x)` returns `True` if any element of the iterable sequence x is true. If the iterable is empty, it returns `False`.",
+        vec![positional(Any)],
+        non_literal_bool(),
+    );
+    add_function(
+        "all",
+        "`all(x)` returns `False` if any element of the iterable sequence x is false. If the iterable is empty, it returns `True`.",
+        vec![positional(Any)],
+        non_literal_bool(),
+    );
+    add_function(
+        "bool",
+        "`bool(x)` interprets `x` as a Boolean value---`True` or `False`. With no argument, `bool()` returns `False`.",
+        vec![positional_opt(Any)],
+        non_literal_bool(),
+    );
     // TODO(withered-magic): SupportsBytes[T] -> T
     add_function(
         "bytes",
         r#"`bytes(x)` converts its argument to a `bytes`.
 
 If x is a `bytes`, the result is `x`.
-    
+
 If x is a string, the result is a `bytes` whose elements are the UTF-8 encoding of the string. Each element of the string that is not part of a valid encoding of a code point is replaced by the UTF-8 encoding of the replacement character, U+FFFD.
-    
+
 If x is an iterable sequence of int values, the result is a `bytes` whose elements are those integers. It is an error if any element is not in the range 0-255.
 
 ```python
@@ -272,7 +292,7 @@ bytes(65)			# error: got int, want string, bytes, or iterable of int
 argument, which is interpreted as an iterable of two-element
 sequences (pairs), each specifying a key/value pair in
 the resulting dictionary.
-        
+
 `dict` also accepts any number of keyword arguments, each of which
 specifies a key/value pair in the resulting dictionary;
 each keyword is treated as a string.
@@ -284,9 +304,9 @@ dict([(1, 2), ["a", "b"]])      # {1: 2, "a": "b"}
 dict(one=1, two=2)              # {"one": 1, "two", 1}
 dict([(1, 2)], x=3)             # {1: 2, "x": 3}
 ```
-        
+
 With no arguments, `dict()` returns a new empty dictionary.
-        
+
 `dict(x)` where x is a dictionary returns a new copy of x."#,
         vec![
             positional_opt(TyKind::Union(smallvec![
@@ -305,16 +325,16 @@ With no arguments, `dict()` returns a new empty dictionary.
         "dir",
         r#"`dir(x)` returns a new sorted list of the names of the attributes (fields and methods) of its operand.
 The attributes of a value `x` are the names `f` such that `x.f` is a valid expression.
-        
+
 For example,
-        
+
 ```python
 dir("hello")                    # ['capitalize', 'count', ...], the methods of a string
 ```
-        
+
 Several types known to the interpreter, such as list, string, and dict, have methods, but none have fields.
 However, an application may define types with fields that may be read or set by statements such as these:
-        
+
 ```text
 y = x.f
 x.f = y
@@ -328,10 +348,10 @@ x.f = y
         r#"`enumerate(x)` returns a list of (index, value) pairs, each containing
 successive values of the iterable sequence xand the index of the value
 within the sequence.
-        
+
 The optional second parameter, `start`, specifies an integer value to
 add to each index.
-        
+
 ```python
 enumerate(["zero", "one", "two"])               # [(0, "zero"), (1, "one"), (2, "two")]
 enumerate(["one", "two"], 1)                    # [(1, "one"), (2, "two")]
@@ -345,12 +365,12 @@ enumerate(["one", "two"], 1)                    # [(1, "one"), (2, "two")]
         r#"`float(x)` interprets its argument as a floating-point number.
 
 If x is a `float`, the result is x.
-        
+
 If x is an `int`, the result is the floating-point value nearest x.
 The call fails if x is too large to represent as a finite `float`.
-        
+
 If x is a `bool`, the result is `1.0` for `True` and `0.0` for `False`.
-        
+
 If x is a string, the string is interpreted as a floating-point literal.
 The function also recognizes the names `Inf` (or `Infinity`) and `NaN`,
 optionally preceded by a `+` or `-` sign.
@@ -358,7 +378,7 @@ These construct the IEEE 754 non-finite values.
 Letter case is not significant.
 The call fails if the literal denotes a value too large to represent as
 a finite `float`.
-        
+
 With no argument, `float()` returns `0.0`.
 "#,
         vec![positional(Any)],
@@ -369,7 +389,7 @@ With no argument, `float()` returns `0.0`.
         r#"The `fail(*args)` function causes execution to fail
 with an error message that includes the string forms of the argument values.
 The precise formatting depends on the implementation.
-        
+
 ```python
 fail("oops")			# "fail: oops"
 fail("oops", 1, False)		# "fail: oops 1 False"
@@ -403,14 +423,14 @@ fail("oops", 1, False)		# "fail: oops 1 False"
         "getattr",
         r#"`getattr(x, name[, default])` returns the value of the attribute (field or method) of x named `name`
 if it exists. If not, it either returns `default` (if specified) or raises an error.
-        
+
 `getattr(x, "f")` is equivalent to `x.f`.
-        
+
 ```python
 getattr("banana", "split")("a")	       		# ["b", "n", "n", ""], equivalent to "banana".split("a")
 getattr("banana", "myattr", "mydefault")	# "mydefault"
 ```
-        
+
 The three-argument form `getattr(x, name, default)` returns the
 provided `default` value instead of failing.
 "#,
@@ -434,13 +454,13 @@ provided `default` value instead of failing.
 such that two equal values have the same hash.
 In other words `x == y` implies `hash(x) == hash(y)`.
 Any other type of argument in an error, even if it is suitable as the key of a dict.
-        
+
 In the interests of reproducibility of Starlark program behavior over time and
 across implementations, the specific hash function for bytes is 32-bit FNV-1a,
 and the hash function for strings is the same as that implemented by
 [java.lang.String.hashCode](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#hashCode),
 a simple polynomial accumulator over the UTF-16 transcoding of the string:
-        
+
 ```python
 s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
 ```
@@ -454,16 +474,16 @@ s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
         r#"`int(x[, base])` interprets its argument as an integer.
 
 If `x` is an `int`, the result is `x`.
-        
+
 If x is a `float`, the result is the integer value nearest to x,
 truncating towards zero. It is an error if x is not finite (`NaN`
 or infinity).
-        
+
 If x is a `bool`, the result is 0 for `False` or 1 for `True`.
-        
+
 If x is a string, it is interpreted as a sequence of digits in the
 specified base, decimal by default.
-        
+
 If `base` is zero, x is interpreted like an integer literal,
 the base being inferred from an optional base prefix such as
 `0b`, `0o`, or `0x` preceding the first digit.
@@ -502,7 +522,7 @@ It is a dynamic error if its argument is not a sequence."#,
         r#"`list` constructs a list.
 
 `list(x)` returns a new list containing the elements of the iterable sequence x.
-    
+
 With no argument, `list()` returns a new empty list."#,
         vec![positional_opt(Any)],
         List(Any.intern()),
@@ -513,10 +533,10 @@ With no argument, `list()` returns a new empty list."#,
 
 It is an error if any element does not support ordered comparison,
 or if the sequence is empty.
-        
+
 The optional named parameter `key` specifies a function to be applied
 to each element prior to comparison.
-        
+
 ```python
 max([3, 1, 4, 1, 5, 9])                         # 9
 max("two", "three", "four")                     # "two", the lexicographically greatest
@@ -539,10 +559,10 @@ max("two", "three", "four", key=len)            # "three", the longest
 
 It is an error if any element does not support ordered comparison,
 or if the sequence is empty.
-        
+
 The optional named parameter `key` specifies a function to be applied
 to each element prior to comparison.
-        
+
 ```python
 min([3, 1, 4, 1, 5, 9])                         # 1
 min("two", "three", "four")                     # "four", the lexicographically least

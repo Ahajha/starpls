@@ -11,14 +11,14 @@ use starpls_hir::Param;
 use starpls_hir::ScopeDef;
 use starpls_hir::Semantics;
 use starpls_hir::Type;
-use starpls_syntax::ast::AstNode;
-use starpls_syntax::ast::AstToken;
-use starpls_syntax::ast::{self};
-use starpls_syntax::parse_module;
 use starpls_syntax::SyntaxKind::*;
 use starpls_syntax::SyntaxNode;
 use starpls_syntax::TextRange;
 use starpls_syntax::TextSize;
+use starpls_syntax::ast::AstNode;
+use starpls_syntax::ast::AstToken;
+use starpls_syntax::ast::{self};
+use starpls_syntax::parse_module;
 
 use crate::FilePosition;
 
@@ -580,14 +580,14 @@ fn strip_last_package_or_target(label: &str) -> &str {
 mod tests {
     use std::fmt::Write;
 
-    use expect_test::expect;
     use expect_test::Expect;
+    use expect_test::expect;
     use starpls_hir::Db;
 
-    use crate::completions::CompletionRelevance;
     use crate::Analysis;
     use crate::CompletionItemKind;
     use crate::FilePosition;
+    use crate::completions::CompletionRelevance;
 
     fn check_completions(fixture: &str, expect: Expect) {
         check_completions_with_options(fixture, false, expect);

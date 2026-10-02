@@ -2,9 +2,9 @@ use std::collections::HashMap;
 use std::fs;
 use std::hash::BuildHasherDefault;
 use std::mem;
+use std::path::MAIN_SEPARATOR;
 use std::path::Path;
 use std::path::PathBuf;
-use std::path::MAIN_SEPARATOR;
 use std::sync::Arc;
 
 use anyhow::anyhow;
@@ -14,12 +14,12 @@ use dashmap::DashMap;
 use indexmap::IndexSet;
 use parking_lot::RwLock;
 use rustc_hash::FxHasher;
-use starpls_bazel::client::BazelClient;
-use starpls_bazel::label::PartialParse;
-use starpls_bazel::label::RepoKind;
 use starpls_bazel::APIContext;
 use starpls_bazel::Label;
 use starpls_bazel::ParseError;
+use starpls_bazel::client::BazelClient;
+use starpls_bazel::label::PartialParse;
+use starpls_bazel::label::RepoKind;
 use starpls_bazel::{self};
 use starpls_common::Dialect;
 use starpls_common::FileId;
@@ -412,13 +412,15 @@ impl FileLoader for DefaultFileLoader {
                 return Ok(None);
             }
 
-            let build_file = try_opt!(fs::read_dir(&resolved_label.resolved_path)
-                .into_iter()
-                .flat_map(|entries| entries.into_iter())
-                .find_map(|entry| match entry.ok()?.file_name().to_str()? {
-                    file_name @ ("BUILD" | "BUILD.bazel") => Some(file_name.to_string()),
-                    _ => None,
-                }));
+            let build_file = try_opt!(
+                fs::read_dir(&resolved_label.resolved_path)
+                    .into_iter()
+                    .flat_map(|entries| entries.into_iter())
+                    .find_map(|entry| match entry.ok()?.file_name().to_str()? {
+                        file_name @ ("BUILD" | "BUILD.bazel") => Some(file_name.to_string()),
+                        _ => None,
+                    })
+            );
             let path = resolved_label.resolved_path.join(build_file);
 
             // If we've already interned this file, then simply return the file id.
@@ -584,9 +586,10 @@ impl FileLoader for DefaultFileLoader {
                     RepoKind::Apparent | RepoKind::Canonical => {
                         root = if self.bzlmod_enabled {
                             let from_repo = try_opt!(self.repo_for_path(&from_path));
-                            let canonical_repo = try_opt!(self
-                                .bazel_client
-                                .resolve_repo_from_mapping(label.repo(), from_repo)?);
+                            let canonical_repo = try_opt!(
+                                self.bazel_client
+                                    .resolve_repo_from_mapping(label.repo(), from_repo)?
+                            );
                             if canonical_repo.is_empty() {
                                 self.workspace.clone()
                             } else {

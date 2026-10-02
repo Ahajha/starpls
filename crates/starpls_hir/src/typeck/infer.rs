@@ -1,14 +1,15 @@
 use std::sync::Arc;
 
 use either::Either;
-use starpls_common::line_index;
-use starpls_common::parse;
 use starpls_common::Diagnostic;
 use starpls_common::DiagnosticTag;
 use starpls_common::File;
 use starpls_common::FileRange;
 use starpls_common::InFile;
 use starpls_common::Severity;
+use starpls_common::line_index;
+use starpls_common::parse;
+use starpls_syntax::TextRange;
 use starpls_syntax::ast::ArithOp;
 use starpls_syntax::ast::AstNode;
 use starpls_syntax::ast::AstPtr;
@@ -17,22 +18,8 @@ use starpls_syntax::ast::BitwiseOp;
 use starpls_syntax::ast::LogicOp;
 use starpls_syntax::ast::UnaryOp;
 use starpls_syntax::ast::{self};
-use starpls_syntax::TextRange;
 
-use crate::def::codeflow::code_flow_graph;
-use crate::def::codeflow::CodeFlowGraph;
-use crate::def::codeflow::FlowNode;
-use crate::def::codeflow::FlowNodeId;
-use crate::def::resolver::Export;
-use crate::def::resolver::Resolver;
-use crate::def::scope::module_scopes;
-use crate::def::scope::ExecutionScopeId;
-use crate::def::scope::FunctionDef;
-use crate::def::scope::LoadItemDef;
-use crate::def::scope::ParameterDef;
-use crate::def::scope::ScopeDef;
-use crate::def::scope::ScopeHirId;
-use crate::def::scope::VariableDef;
+use crate::Name;
 use crate::def::Argument;
 use crate::def::Expr;
 use crate::def::ExprId;
@@ -45,19 +32,23 @@ use crate::def::Param;
 use crate::def::ParamId;
 use crate::def::Stmt;
 use crate::def::StmtId;
+use crate::def::codeflow::CodeFlowGraph;
+use crate::def::codeflow::FlowNode;
+use crate::def::codeflow::FlowNodeId;
+use crate::def::codeflow::code_flow_graph;
+use crate::def::resolver::Export;
+use crate::def::resolver::Resolver;
+use crate::def::scope::ExecutionScopeId;
+use crate::def::scope::FunctionDef;
+use crate::def::scope::LoadItemDef;
+use crate::def::scope::ParameterDef;
+use crate::def::scope::ScopeDef;
+use crate::def::scope::ScopeHirId;
+use crate::def::scope::VariableDef;
+use crate::def::scope::module_scopes;
 use crate::display::DisplayWithDb;
 use crate::module;
 use crate::source_map;
-use crate::typeck::assign_tys;
-use crate::typeck::builtins::builtin_types;
-use crate::typeck::call::Slot;
-use crate::typeck::call::SlotProvider;
-use crate::typeck::call::Slots;
-use crate::typeck::intrinsics::IntrinsicFunctionParam;
-use crate::typeck::intrinsics::IntrinsicTypes;
-use crate::typeck::resolve_builtin_type_ref;
-use crate::typeck::resolve_type_ref;
-use crate::typeck::resolve_type_ref_opt;
 use crate::typeck::CodeFlowCacheKey;
 use crate::typeck::DictLiteral;
 use crate::typeck::FileExprId;
@@ -76,7 +67,16 @@ use crate::typeck::TyData;
 use crate::typeck::TyKind;
 use crate::typeck::TypeRef;
 use crate::typeck::TypecheckCancelled;
-use crate::Name;
+use crate::typeck::assign_tys;
+use crate::typeck::builtins::builtin_types;
+use crate::typeck::call::Slot;
+use crate::typeck::call::SlotProvider;
+use crate::typeck::call::Slots;
+use crate::typeck::intrinsics::IntrinsicFunctionParam;
+use crate::typeck::intrinsics::IntrinsicTypes;
+use crate::typeck::resolve_builtin_type_ref;
+use crate::typeck::resolve_type_ref;
+use crate::typeck::resolve_type_ref_opt;
 
 impl TyContext<'_> {
     fn infer_all_exprs(&mut self, file: File) {
@@ -513,7 +513,7 @@ impl TyContext<'_> {
                             .unwrap_or_else(|| {
                                 match receiver_ty.kind() {
                                     TyKind::Struct(Some(Struct::FieldSignature { ty })) => {
-                                        return ty.clone()
+                                        return ty.clone();
                                     }
                                     TyKind::Struct(Some(Struct::RuleAttributes {
                                         rule_kind,
@@ -533,7 +533,7 @@ impl TyContext<'_> {
                                             .unwrap_or_else(|| self.unknown_ty());
                                     }
                                     TyKind::Struct(_) | TyKind::ProviderInstance(_) => {
-                                        return self.unknown_ty()
+                                        return self.unknown_ty();
                                     }
                                     _ => {}
                                 }
@@ -1228,7 +1228,7 @@ impl TyContext<'_> {
 
         match (lhs_kind, rhs_kind) {
             (TyKind::Any | TyKind::Unknown, _) | (_, TyKind::Any | TyKind::Unknown) => {
-                return self.unknown_ty()
+                return self.unknown_ty();
             }
             _ => {}
         }

@@ -4,13 +4,13 @@ use std::fmt::Write;
 use std::fs;
 use std::path::PathBuf;
 
-use expect_test::expect_file;
 use expect_test::ExpectFile;
+use expect_test::expect_file;
 use runfiles::find_runfiles_dir;
 
-use crate::parse;
 use crate::StrStep;
 use crate::StrWithTokens;
+use crate::parse;
 
 fn check(input: &str, expected: ExpectFile) {
     let str_with_tokens = StrWithTokens::new(input);

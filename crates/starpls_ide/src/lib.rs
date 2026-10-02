@@ -3,8 +3,8 @@ use std::panic;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use dashmap::mapref::entry::Entry;
 use dashmap::DashMap;
+use dashmap::mapref::entry::Entry;
 use salsa::ParallelDatabase;
 use starpls_bazel::APIContext;
 use starpls_bazel::Builtins;
