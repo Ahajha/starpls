@@ -51,10 +51,10 @@ crate.annotation(
 
 register_toolchains("//:prost_toolchain")
 
-rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext", dev_dependency = True)
+rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "typescript", dev_dependency = True)
 rules_ts_ext.deps(
-    ts_integrity = "sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==",
-    ts_version_from = "//editors/code:package.json",
+    integrity = "sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==",
+    version_from = "//editors/code:package.json",
 )
 use_repo(rules_ts_ext, "npm_typescript")
 
