@@ -424,13 +424,13 @@ fn maybe_str_context(file_id: FileId, root: &SyntaxNode, pos: TextSize) -> Optio
         let load_stmt = ast::LoadStmt::cast(parent.parent()?)?;
         return Some(StringContext::LoadItem { file_id, load_stmt });
     } else if let Some(expr) = ast::LiteralExpr::cast(parent) {
-        if let Some(index_expr) = ast::IndexExpr::cast(expr.syntax().parent()?) {
-            if index_expr.index() == Some(ast::Expression::Literal(expr)) {
-                return Some(StringContext::DictKey {
-                    file_id,
-                    lhs: index_expr.lhs()?,
-                });
-            }
+        if let Some(index_expr) = ast::IndexExpr::cast(expr.syntax().parent()?)
+            && index_expr.index() == Some(ast::Expression::Literal(expr))
+        {
+            return Some(StringContext::DictKey {
+                file_id,
+                lhs: index_expr.lhs()?,
+            });
         }
 
         // Check if the current text is potentially a label.

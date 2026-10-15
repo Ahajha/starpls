@@ -1762,7 +1762,7 @@ impl GlobalContext {
         }
     }
 
-    pub fn cancel(&self) -> CancelGuard {
+    pub fn cancel(&self) -> CancelGuard<'_> {
         CancelGuard::new(self)
     }
 
@@ -1879,6 +1879,7 @@ impl TypeRefResolver<'_, '_> {
         mut next: &'c Name,
         mut segments: impl Iterator<Item = &'c Name>,
     ) -> Option<Ty> {
+        #[allow(clippy::question_mark)] // Fix seems to be incorrect
         let (tcx, usage) = match &mut self.context {
             Some(context) => context,
             None => return None,
@@ -1919,12 +1920,11 @@ impl TypeRefResolver<'_, '_> {
         }
 
         // If `usage` was passed, try to resolve as a custom provider defined in the corresponding scope.
-        if let Some((tcx, usage)) = &mut self.context {
-            if let Some(ty) = tcx.infer_name(usage.file, name, usage.value) {
-                if let TyKind::Provider(provider) = ty.kind() {
-                    return TyKind::ProviderInstance(provider.clone()).intern();
-                }
-            }
+        if let Some((tcx, usage)) = &mut self.context
+            && let Some(ty) = tcx.infer_name(usage.file, name, usage.value)
+            && let TyKind::Provider(provider) = ty.kind()
+        {
+            return TyKind::ProviderInstance(provider.clone()).intern();
         }
 
         match name.as_str() {

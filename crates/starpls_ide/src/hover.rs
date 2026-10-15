@@ -152,11 +152,11 @@ pub(crate) fn hover(db: &Database, FilePosition { file_id, pos }: FilePosition) 
                 ty.display(db),
             );
 
-            if let Some(doc) = param.doc(db) {
-                if !doc.is_empty() {
-                    text.push_str(&unindent_doc(&doc));
-                    text.push('\n');
-                }
+            if let Some(doc) = param.doc(db)
+                && !doc.is_empty()
+            {
+                text.push_str(&unindent_doc(&doc));
+                text.push('\n');
             }
             return Some(text.into());
         }

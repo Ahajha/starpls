@@ -335,22 +335,22 @@ impl DefaultFileLoader {
                 let contents = match fs::read_to_string(&path) {
                     Ok(contents) => contents,
                     Err(err) => {
-                        if let Some(canonical_repo) = fetch_repo_on_err {
-                            if !self
+                        if let Some(canonical_repo) = fetch_repo_on_err
+                            && !self
                                 .external_output_base
                                 .join(&canonical_repo)
                                 .try_exists()
                                 .ok()
                                 .unwrap_or_default()
-                            {
-                                let _ = self.fetch_repo_sender.send(
-                                    Task::FetchExternalRepoRequest(FetchExternalRepoRequest {
-                                        file_id: from,
-                                        repo: canonical_repo,
-                                    }),
-                                );
-                            }
+                        {
+                            let _ = self.fetch_repo_sender.send(Task::FetchExternalRepoRequest(
+                                FetchExternalRepoRequest {
+                                    file_id: from,
+                                    repo: canonical_repo,
+                                },
+                            ));
                         }
+
                         return Err(err.into());
                     }
                 };
@@ -520,16 +520,15 @@ impl FileLoader for DefaultFileLoader {
                 for entry in readdir {
                     let entry = entry?;
                     let file_type = entry.file_type()?;
-                    if file_type.is_file() {
-                        if let Some(name) = entry.file_name().to_str() {
-                            if name.ends_with(".star") || name.ends_with(".sky") {
-                                candidates.push(LoadItemCandidate {
-                                    kind: LoadItemCandidateKind::File,
-                                    path: name.to_string(),
-                                    replace_trailing_slash: false,
-                                })
-                            }
-                        }
+                    if file_type.is_file()
+                        && let Some(name) = entry.file_name().to_str()
+                        && (name.ends_with(".star") || name.ends_with(".sky"))
+                    {
+                        candidates.push(LoadItemCandidate {
+                            kind: LoadItemCandidateKind::File,
+                            path: name.to_string(),
+                            replace_trailing_slash: false,
+                        })
                     }
                 }
 

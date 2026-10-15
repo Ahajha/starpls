@@ -177,19 +177,18 @@ impl starpls_common::Db for Database {
             ref mut contents,
             ..
         } = resolved_path
+            && let Entry::Vacant(entry) = self.files.entry(build_file)
         {
-            if let Entry::Vacant(entry) = self.files.entry(build_file) {
-                entry.insert(File::new(
-                    self,
-                    build_file,
-                    Dialect::Bazel,
-                    Some(FileInfo::Bazel {
-                        api_context: APIContext::Build,
-                        is_external: false,
-                    }),
-                    contents.take().unwrap_or_default(),
-                ));
-            }
+            entry.insert(File::new(
+                self,
+                build_file,
+                Dialect::Bazel,
+                Some(FileInfo::Bazel {
+                    api_context: APIContext::Build,
+                    is_external: false,
+                }),
+                contents.take().unwrap_or_default(),
+            ));
         }
 
         Ok(Some(resolved_path))

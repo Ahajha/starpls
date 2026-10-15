@@ -817,36 +817,33 @@ impl TyContext<'_> {
                                         self.add_expr_diagnostic_error(file, expr, format!("Argument of type \"{}\" cannot be assigned to parameter of type \"{}\"", ty.display(self.db).alt(), param_ty.display(self.db).alt()));
                                     }
                                     if let IntrinsicFunctionParam::Keyword {
-                                        name,
-                                        deprecated,
-                                        ..
+                                        name, deprecated, ..
                                     } = param
+                                        && *deprecated
                                     {
-                                        if *deprecated {
-                                            let source_map = source_map(self.db, file);
-                                            let arg_name_node = source_map
-                                                .expr_map_back
-                                                .get(&expr)
-                                                .and_then(|arg_value_ptr| {
-                                                    arg_value_ptr.syntax_node_ptr().try_to_node(
-                                                        &parse(self.db, file).syntax(self.db),
-                                                    )
-                                                })
-                                                .and_then(|arg_value_node| arg_value_node.parent())
-                                                .and_then(ast::KeywordArgument::cast)
-                                                .and_then(|keyword_arg| keyword_arg.name());
-                                            if let Some(arg_name_node) = arg_name_node {
-                                                self.add_diagnostic_for_range(
-                                                    file,
-                                                    Severity::Info,
-                                                    arg_name_node.syntax().text_range(),
-                                                    Some(vec![DiagnosticTag::Deprecated]),
-                                                    format!(
-                                                        "Argument \"{}\" is deprecated",
-                                                        name.as_str()
-                                                    ),
-                                                );
-                                            }
+                                        let source_map = source_map(self.db, file);
+                                        let arg_name_node = source_map
+                                            .expr_map_back
+                                            .get(&expr)
+                                            .and_then(|arg_value_ptr| {
+                                                arg_value_ptr.syntax_node_ptr().try_to_node(
+                                                    &parse(self.db, file).syntax(self.db),
+                                                )
+                                            })
+                                            .and_then(|arg_value_node| arg_value_node.parent())
+                                            .and_then(ast::KeywordArgument::cast)
+                                            .and_then(|keyword_arg| keyword_arg.name());
+                                        if let Some(arg_name_node) = arg_name_node {
+                                            self.add_diagnostic_for_range(
+                                                file,
+                                                Severity::Info,
+                                                arg_name_node.syntax().text_range(),
+                                                Some(vec![DiagnosticTag::Deprecated]),
+                                                format!(
+                                                    "Argument \"{}\" is deprecated",
+                                                    name.as_str()
+                                                ),
+                                            );
                                         }
                                     }
                                 }
@@ -946,10 +943,8 @@ impl TyContext<'_> {
                                             self.add_expr_diagnostic_error(file, expr, format!("Argument of type \"{}\" cannot be assigned to parameter of type \"{}\"", ty.display(self.db).alt(), expected_ty.display(self.db).alt()));
                                         }
                                     }
-                                    SlotProvider::Missing => {
-                                        if attr.mandatory {
-                                            missing_attrs.push(name);
-                                        }
+                                    SlotProvider::Missing if attr.mandatory => {
+                                        missing_attrs.push(name)
                                     }
                                     _ => {}
                                 }
@@ -999,10 +994,8 @@ impl TyContext<'_> {
                                             self.add_expr_diagnostic_error(file, expr, format!("Argument of type \"{}\" cannot be assigned to parameter of type \"{}\"", ty.display(self.db).alt(), expected_ty.display(self.db).alt()));
                                         }
                                     }
-                                    SlotProvider::Missing => {
-                                        if data.attr.mandatory {
-                                            missing_attrs.push(&data.name);
-                                        }
+                                    SlotProvider::Missing if data.attr.mandatory => {
+                                        missing_attrs.push(&data.name);
                                     }
                                     _ => {}
                                 }
@@ -1059,10 +1052,8 @@ impl TyContext<'_> {
                                             self.add_expr_diagnostic_error(file, expr, format!("Argument of type \"{}\" cannot be assigned to parameter of type \"{}\"", ty.display(self.db).alt(), expected_ty.display(self.db).alt()));
                                         }
                                     }
-                                    SlotProvider::Missing => {
-                                        if attr.mandatory {
-                                            missing_attrs.push(name);
-                                        }
+                                    SlotProvider::Missing if attr.mandatory => {
+                                        missing_attrs.push(name);
                                     }
                                     _ => {}
                                 }
@@ -1519,17 +1510,16 @@ impl TyContext<'_> {
                 for def in defs.skip_while(|def| def.scope > expr_scope) {
                     let ty = match def.def {
                         ScopeDef::Variable(VariableDef { file, expr, source }) => {
-                            if def_execution_scope != ExecutionScopeId::Module
-                                || name.as_str().starts_with('_')
+                            if (def_execution_scope != ExecutionScopeId::Module
+                                || name.as_str().starts_with('_'))
+                                && let ScopeHirId::Expr(usage_expr) = hir_id
                             {
-                                if let ScopeHirId::Expr(usage_expr) = hir_id {
-                                    let key = InFile {
-                                        file: *file,
-                                        value: Either::Left(*expr),
-                                    };
-                                    if usage_expr != *expr {
-                                        self.cx.definition_is_used.insert(key, true);
-                                    }
+                                let key = InFile {
+                                    file: *file,
+                                    value: Either::Left(*expr),
+                                };
+                                if usage_expr != *expr {
+                                    self.cx.definition_is_used.insert(key, true);
                                 }
                             }
 
