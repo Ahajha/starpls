@@ -17,7 +17,7 @@ bazel_dep(name = "rules_nodejs", version = "6.7.5")
 toolchains = use_extension("@rules_rs//rs/toolchains:module_extension.bzl", "toolchains")
 toolchains.toolchain(
     edition = "2024",
-    version = "1.86.0",
+    version = "1.98.1",
 )
 use_repo(toolchains, "default_rust_toolchains")
 

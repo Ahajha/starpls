@@ -268,15 +268,15 @@ pub fn find_runfiles_dir() -> Result<PathBuf> {
     );
 
     // If Bazel told us about the runfiles dir, use that without looking further.
-    if let Some(runfiles_dir) = std::env::var_os(RUNFILES_DIR_ENV_VAR).map(PathBuf::from) {
-        if runfiles_dir.is_dir() {
-            return Ok(runfiles_dir);
-        }
+    if let Some(runfiles_dir) = std::env::var_os(RUNFILES_DIR_ENV_VAR).map(PathBuf::from)
+        && runfiles_dir.is_dir()
+    {
+        return Ok(runfiles_dir);
     }
-    if let Some(test_srcdir) = std::env::var_os(TEST_SRCDIR_ENV_VAR).map(PathBuf::from) {
-        if test_srcdir.is_dir() {
-            return Ok(test_srcdir);
-        }
+    if let Some(test_srcdir) = std::env::var_os(TEST_SRCDIR_ENV_VAR).map(PathBuf::from)
+        && test_srcdir.is_dir()
+    {
+        return Ok(test_srcdir);
     }
 
     // Consume the first argument (argv[0])
