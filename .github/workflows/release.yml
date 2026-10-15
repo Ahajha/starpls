@@ -31,7 +31,7 @@ jobs:
         env:
           BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
       - name: Build
-        run: bazel build -c opt ${{ matrix.target.name == 'linux-aarch64' && '--platforms @zig_sdk//platform:linux_arm64' || '' }} //crates/starpls
+        run: bazel build -c opt //crates/starpls
       - uses: actions/upload-artifact@v4
         with:
           name: starpls-${{ matrix.target.name }}
